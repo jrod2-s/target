@@ -2,15 +2,18 @@
 #include <SPI.h>
 
 // Uno
-#define RFM69_CS 10
-#define RFM69_INT 2
-#define RFM69_RST 9
+//#define RFM69_CS 10
+//#define RFM69_INT 2
+//#define RFM69_RST 9
+
+#define RFM69_CS 17
+#define RFM69_INT 7
+#define RFM69_RST 6
+#define LED 13
 
 #define RF69_FREQ 915.0
 
 RH_RF69 rf69(RFM69_CS, RFM69_INT);
-
-//TODO: Having datatype trouble when converting uint to c array and printing out over serial monitor
 
 void setup() {
   Serial.begin(9600);
@@ -41,18 +44,20 @@ void setup() {
 
 void handle_buffer(uint8_t *buf, uint8_t len){
   //TODO: Update this to use bluetooth to send data to phone
+  Serial.print("buf: ");
+  Serial.println(buf[0]);
   Serial.print("Got a hit at: ");
-   for (uint8_t i = 0; i < len; i++) {
-    Serial.print(buf[i]);   // raw print
-    Serial.print(",");
+  
+  Serial.print(buf[0]);   // raw print
+  Serial.print(",");
+  Serial.println(buf[1]);
   }
-
-  Serial.println();
-}
 
 void loop() {
   if (rf69.available()){
-    uint8_t buf[64];
+    uint8_t buf[5];
+    memset(buf, 0, sizeof(buf));
+
     uint8_t len;
     if (rf69.recv( (uint8_t *) buf, &len))
     {
