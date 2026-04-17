@@ -2,29 +2,38 @@
 #include <SPI.h>
 #include <LiquidCrystal_I2C.h>
 
-// Uno
+// Set up SPI pins
 #define RFM69_CS 10
 #define RFM69_INT 3
 #define RFM69_RST 9
 
+// Define radio frequency and initialize radio
 #define RF69_FREQ 915.0
-
 RH_RF69 rf69(RFM69_CS, RFM69_INT);
 
+// Initialize LCD
 LiquidCrystal_I2C lcd(0x27, 20, 4);
 
 void setup() {
-  Serial.begin(9600);
-//  while (!Serial && millis() < 3000);
-  delay(2000);
-
-  Serial.println("Started Serial Comms");
-  
   //Start LCD
   lcd.init();
   lcd.backlight();
   lcd.clear();
+  
+  // Print Welcome Message
+  lcd.setCursor(7,0);
+  lcd.print("Straight");
+  lcd.setCursor(7,1);
+  lcd.print("Shot");
+  lcd.setCursor(7,2);
+  lcd.print("Steel");
+  delay(2000);
 
+  // Start serial messages
+  Serial.begin(9600);
+  delay(2000);
+
+  Serial.println("Started Serial Comms");
   
   // Set Up Radio Settings
   pinMode(RFM69_CS, OUTPUT);
@@ -36,10 +45,15 @@ void setup() {
   digitalWrite(RFM69_RST, LOW);
   delay(10);
 
+  lcd.clear();
+
+  // Start radio, check for failure
   if (!rf69.init()) {
     Serial.println("RFM69 init failed!");
     lcd.setCursor(0,1);
-    lcd.print("RFM69 init failed!");
+    lcd.print("Comms failure!");
+    lcd.setCursor(0,2);
+    lcd.print("Contact tech support");
     while(1);
   }
   
@@ -59,13 +73,13 @@ void handle_buffer(uint8_t *buf, uint8_t len){
   Serial.print(",");
   Serial.println(buf[1]);
 
-  // LCD Print
-
+  // Convert array to in and set up message
   int updown = -(buf[0] - 5);
   int rightleft = (buf[1] - 5);
   String updownmsg;
   String rightleftmsg;
 
+  // Updown Message
   if (updown > 0){
     updownmsg = " inches high";
   }
@@ -76,6 +90,7 @@ void handle_buffer(uint8_t *buf, uint8_t len){
     updownmsg = "centered up/down";
   }
 
+  // Rightleft Message
   if (rightleft > 0) {
     rightleftmsg = " inches right";
   } 
@@ -103,7 +118,7 @@ void handle_buffer(uint8_t *buf, uint8_t len){
   }
 
 void loop() {
-
+  // Run whenever new message arrvies
   if (rf69.available()){
     uint8_t buf[5];
     memset(buf, 0, sizeof(buf));
