@@ -3,6 +3,7 @@
 #include <LiquidCrystal_I2C.h>
 
 // Start manufacturing the receiver box and creating the circuit
+// Remove serial comms
 
 // Set up SPI pins
 #define RFM69_CS 10
@@ -18,14 +19,6 @@ RH_RF69 rf69(RFM69_CS, RFM69_INT);
 LiquidCrystal_I2C lcd(0x27, 20, 4);
 
 void setup() {
-  // Start up Buzzer
-  pinMode(BUZZER, OUTPUT);
-  tone(BUZZER, 261.63);
-  delay(500);
-  tone(BUZZER, 329.63);
-  delay(500);
-  tone(BUZZER, 392.00, 500);
-  
   //Start LCD
   lcd.init();
   lcd.backlight();
@@ -38,7 +31,14 @@ void setup() {
   lcd.print("Shot");
   lcd.setCursor(7,2);
   lcd.print("Steel");
-  delay(2000);
+
+  // Start up Buzzer
+  pinMode(BUZZER, OUTPUT);
+  tone(BUZZER, 261.63);
+  delay(500);
+  tone(BUZZER, 329.63);
+  delay(500);
+  tone(BUZZER, 392.00, 500);
 
   // Start serial messages
   Serial.begin(9600);
