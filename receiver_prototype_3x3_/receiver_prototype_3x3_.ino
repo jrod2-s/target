@@ -2,10 +2,13 @@
 #include <SPI.h>
 #include <LiquidCrystal_I2C.h>
 
+// Start manufacturing the receiver box and creating the circuit
+
 // Set up SPI pins
 #define RFM69_CS 10
 #define RFM69_INT 3
 #define RFM69_RST 9
+#define BUZZER 2
 
 // Define radio frequency and initialize radio
 #define RF69_FREQ 915.0
@@ -15,6 +18,14 @@ RH_RF69 rf69(RFM69_CS, RFM69_INT);
 LiquidCrystal_I2C lcd(0x27, 20, 4);
 
 void setup() {
+  // Start up Buzzer
+  pinMode(BUZZER, OUTPUT);
+  tone(BUZZER, 261.63);
+  delay(500);
+  tone(BUZZER, 329.63);
+  delay(500);
+  tone(BUZZER, 392.00, 500);
+  
   //Start LCD
   lcd.init();
   lcd.backlight();
@@ -101,6 +112,9 @@ void handle_buffer(uint8_t *buf, uint8_t len){
     rightleftmsg = "centered right/left";
   }
 
+  // Start Buzz
+  tone(BUZZER, 110, 500);
+
   // Print Message
   lcd.clear();
 
@@ -117,7 +131,7 @@ void handle_buffer(uint8_t *buf, uint8_t len){
   lcd.print(rightleftmsg);
   }
 
-void loop() {
+void loop() {  
   // Run whenever new message arrvies
   if (rf69.available()){
     uint8_t buf[5];
